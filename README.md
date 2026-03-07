@@ -1,6 +1,6 @@
 # MedSync
 
-MedSync adalah sistem manajemen klinik berbasis web yang dibangun menggunakan **Laravel 11** dan **TailwindCSS**.
+MedSync adalah sistem manajemen klinik berbasis web yang dibangun menggunakan **Laravel** dan **TailwindCSS**.
 
 ## Fitur Utama
 
