@@ -9,22 +9,15 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-    public function up(): void
+    public function up()
     {
-        Schema::create('dokter', function (Blueprint $table) {
-            $table->id('id_dokter');
-
-            $table->unsignedBigInteger('id_user')->unique();
-
-            $table->string('spesialisasi');
-
-            $table->timestamps();
-
-            $table->foreign('id_user')
-                ->references('id_user')
-                ->on('users')
-                ->cascadeOnDelete();
-        });
+    Schema::create('dokters', function (Blueprint $table) {
+        $table->id();
+        $table->string('nama_dokter');
+        $table->string('spesialis');
+        $table->string('nomor_telepon');
+        $table->timestamps();
+    });
     }
 
     /**
