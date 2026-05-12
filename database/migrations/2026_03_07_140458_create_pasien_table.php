@@ -9,16 +9,16 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-   public function up()
+   public function up(): void
     {
-    Schema::create('pasiens', function (Blueprint $table) {
-        $table->id();
-        $table->string('nama_pasien');
-        $table->string('nik')->unique();
-        $table->date('tanggal_lahir');
-        $table->text('alamat');
-        $table->timestamps();
-    });
+        Schema::create('pasien', function (Blueprint $table) {
+            $table->id('id_pasien'); // PK sesuai ERD
+            $table->string('nama');
+            $table->text('alamat');
+            $table->string('no_hp');
+            $table->date('tgl_lahir');
+            $table->timestamps();
+        });
     }
 
     /**

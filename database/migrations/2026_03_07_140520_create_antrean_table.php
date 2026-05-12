@@ -12,18 +12,16 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('antrean', function (Blueprint $table) {
-            $table->id('id_antrean');
-
-            $table->unsignedBigInteger('id_pasien');
-            $table->unsignedBigInteger('id_dokter');
-
-            $table->integer('nomor_antrean');
-            $table->enum('status', ['menunggu', 'dipanggil', 'selesai']);
-
+            $table->id('id_antrean'); // PK sesuai ERD
+            $table->unsignedBigInteger('id_pasien'); // FK ke pasien
+            $table->unsignedBigInteger('id_dokter'); // FK ke dokter
+            $table->string('nomor_antrean');
+            $table->string('status');
             $table->timestamps();
 
-            $table->foreign('id_pasien')->references('id_pasien')->on('pasien')->cascadeOnDelete();
-            $table->foreign('id_dokter')->references('id_dokter')->on('dokter')->cascadeOnDelete();
+            // Bikin relasi
+            $table->foreign('id_pasien')->references('id_pasien')->on('pasien')->onDelete('cascade');
+            $table->foreign('id_dokter')->references('id_dokter')->on('dokter')->onDelete('cascade');
         });
     }
 

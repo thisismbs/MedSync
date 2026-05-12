@@ -12,27 +12,17 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('rekam_medis', function (Blueprint $table) {
-            $table->id('id_rekam');
-
-            $table->unsignedBigInteger('id_pasien');
-            $table->unsignedBigInteger('id_dokter');
-
-            $table->dateTime('tanggal');
-
+            $table->id('id_rekam'); // PK sesuai ERD
+            $table->unsignedBigInteger('id_pasien'); // FK ke pasien
+            $table->unsignedBigInteger('id_dokter'); // FK ke dokter
+            $table->date('tanggal');
             $table->text('diagnosa');
-            $table->text('tindakan')->nullable();
-
+            $table->text('tindakan');
             $table->timestamps();
 
-            $table->foreign('id_pasien')
-                ->references('id_pasien')
-                ->on('pasien')
-                ->cascadeOnDelete();
-
-            $table->foreign('id_dokter')
-                ->references('id_dokter')
-                ->on('dokter')
-                ->cascadeOnDelete();
+            // Bikin relasi
+            $table->foreign('id_pasien')->references('id_pasien')->on('pasien')->onDelete('cascade');
+            $table->foreign('id_dokter')->references('id_dokter')->on('dokter')->onDelete('cascade');
         });
     }
 
