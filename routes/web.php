@@ -5,25 +5,38 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AntreanController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\PasienController;
+use App\Http\Controllers\DokterController;
+use App\Http\Controllers\RekamMedisController;
 
 Route::resource('antrean', AntreanController::class)->middleware('auth');
 
 Route::get('/', function () {
-    return view('welcome');
+    return redirect()->route('login');
 });
 
-Route::get('/dashboard', function () {
-    $role = auth()->user()->role; // Cek rolenya apa di database
+use App\Models\Antrean;
+use App\Models\Dokter;
+use Carbon\Carbon;
 
-    if ($role == 'admin') {
+Route::get('/dashboard', function () {
+    $user = auth()->user();
+
+    if ($user->role == 'admin') {
         return view('admin.dashboard');
-    } elseif ($role == 'resepsionis') {
-        return view('resepsionis.dashboard'); // Belum dibikin, biarin aja dulu
-    } elseif ($role == 'dokter') {
-        return view('dokter.dashboard'); // Belum dibikin, biarin aja dulu
+    } elseif ($user->role == 'resepsionis') {
+        return view('resepsionis.dashboard');
+    } elseif ($user->role == 'dokter') {
+        // Cari ID Dokter si User ini
+        $dokter = Dokter::where('id_user', $user->id_user)->first();
+        
+        // Ngitung statistik khusus hari ini & khusus buat dokter ini aja
+        $totalPasien = Antrean::where('id_dokter', $dokter->id_dokter)->whereDate('created_at', Carbon::today())->count();
+        $menunggu = Antrean::where('id_dokter', $dokter->id_dokter)->where('status', 'Menunggu')->whereDate('created_at', Carbon::today())->count();
+        $selesai = Antrean::where('id_dokter', $dokter->id_dokter)->where('status', 'Selesai')->whereDate('created_at', Carbon::today())->count();
+
+        return view('dokter.dashboard', compact('dokter', 'totalPasien', 'menunggu', 'selesai'));
     }
 
-    // Kalau rolenya ga jelas, lempar ke dashboard default
     return view('dashboard'); 
 })->middleware(['auth', 'verified'])->name('dashboard');
 
@@ -50,6 +63,12 @@ Route::middleware('auth')->group(function () {
     Route::get('/resepsionis/antrean/tambah', [AntreanController::class, 'create'])->name('resepsionis.antrean.create');
     Route::post('/resepsionis/antrean', [AntreanController::class, 'store'])->name('resepsionis.antrean.store');
     Route::delete('/resepsionis/antrean/{id}', [AntreanController::class, 'destroy'])->name('resepsionis.antrean.destroy');
+    Route::get('/dokter/antrean', [DokterController::class, 'antrean'])->name('dokter.antrean');
+    Route::put('/dokter/antrean/{id}/panggil', [DokterController::class, 'panggil'])->name('dokter.antrean.panggil');
+    Route::get('/dokter/rekam-medis', [RekamMedisController::class, 'index'])->name('dokter.rekammedis');
+    Route::get('/dokter/rekam-medis/{id_antrean}/isi', [RekamMedisController::class, 'create'])->name('dokter.rekammedis.create');
+    Route::post('/dokter/rekam-medis/{id_antrean}', [RekamMedisController::class, 'store'])->name('dokter.rekammedis.store');
+    Route::get('/dokter/rekam-medis/detail/{id_rm}', [RekamMedisController::class, 'show'])->name('dokter.rekammedis.show');
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
