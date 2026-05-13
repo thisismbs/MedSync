@@ -3,22 +3,23 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Pasien; // Panggil model Pasien
+use App\Models\Pasien; // <--- Ini kunci biar nggak "Class Not Found"
 
 class PasienController extends Controller
 {
-    // TAMPILIN DATA & SEARCH
+    // TAMPILIN DAFTAR PASIEN
     public function index(Request $request)
     {
         $search = $request->search;
-        
-        // Cari berdasarkan nama atau no HP
-        $pasiens = Pasien::when($search, function($query, $search) {
-            return $query->where('nama', 'like', "%{$search}%")
-                         ->orWhere('no_hp', 'like', "%{$search}%");
-        })->get();
 
-        // Cek Role buat nentuin view mana yang dibuka
+        $pasiens = Pasien::when($search, function($query, $search) {
+                return $query->where('nama', 'like', "%{$search}%")
+                             ->orWhere('alamat', 'like', "%{$search}%");
+            })
+            ->paginate(10)
+            ->withQueryString();
+
+        // Cek siapa yang login biar view-nya nggak nyasar
         if (auth()->user()->role == 'admin') {
             return view('admin.kelola-pasien', compact('pasiens', 'search'));
         } else {
@@ -36,19 +37,19 @@ class PasienController extends Controller
         }
     }
 
-    // SIMPAN DATA BARU
+    // SIMPAN DATA KE DATABASE
     public function store(Request $request)
     {
         $request->validate([
             'nama' => 'required',
-            'alamat' => 'required',
+            'tgl_lahir' => 'required',
             'no_hp' => 'required',
-            'tgl_lahir' => 'required|date'
+            'alamat' => 'required'
         ]);
 
         Pasien::create($request->all());
 
-        // Cek Role buat nentuin redirect rutenya ke mana abis nge-save
+        // Lempar balik ke rute yang bener
         if (auth()->user()->role == 'admin') {
             return redirect()->route('admin.pasien')->with('success', 'Data pasien berhasil ditambahkan!');
         } else {
@@ -68,14 +69,14 @@ class PasienController extends Controller
         }
     }
 
-    // UPDATE DATA
+    // UPDATE DATA DI DATABASE
     public function update(Request $request, $id)
     {
         $request->validate([
             'nama' => 'required',
-            'alamat' => 'required',
+            'tgl_lahir' => 'required',
             'no_hp' => 'required',
-            'tgl_lahir' => 'required|date'
+            'alamat' => 'required'
         ]);
 
         $pasien = Pasien::findOrFail($id);
@@ -94,10 +95,6 @@ class PasienController extends Controller
         $pasien = Pasien::findOrFail($id);
         $pasien->delete();
 
-        if (auth()->user()->role == 'admin') {
-            return redirect()->route('admin.pasien')->with('success', 'Data pasien berhasil dihapus!');
-        } else {
-            return redirect()->route('resepsionis.pasien')->with('success', 'Data pasien berhasil dihapus!');
-        }
+        return redirect()->back()->with('success', 'Data pasien berhasil dihapus!');
     }
 }

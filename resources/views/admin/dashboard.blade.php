@@ -33,7 +33,7 @@
         <div class="p-4 border-t border-teal-700">
             <form method="POST" action="{{ route('logout') }}">
                 @csrf
-                <a href="{{ route('logout') }}" onclick="event.preventDefault(); this.closest('form').submit();" class="block px-4 py-2 text-center bg-red-500 hover:bg-red-600 rounded-lg transition-colors">
+                <a href="{{ route('logout') }}" onclick="event.preventDefault(); this.closest('form').submit();" class="block px-4 py-2 text-center bg-red-500 hover:bg-red-600 rounded-lg transition-colors text-white">
                     <i class="fa-solid fa-sign-out-alt mr-2"></i> Keluar
                 </a>
             </form>
@@ -58,31 +58,74 @@
         </header>
 
         <div class="p-4 lg:p-8">
+            
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <div class="bg-white rounded-xl shadow-md p-6 flex items-center">
+                
+                <div class="bg-white rounded-xl shadow-md p-6 flex items-center border-l-4 border-blue-500">
                     <div class="p-4 rounded-full bg-blue-100 text-blue-500 mr-4">
-                        <i class="fa-solid fa-users fa-2x"></i>
+                        <i class="fa-solid fa-user-doctor fa-2x"></i>
                     </div>
                     <div>
-                        <p class="text-sm text-gray-500 font-medium uppercase">Total Akun</p>
-                        <p class="text-3xl font-bold text-gray-800">{{ \App\Models\User::count() }}</p>
+                        <p class="text-sm text-gray-500 font-medium uppercase">Akun Dokter</p>
+                        <p class="text-3xl font-bold text-gray-800">{{ \App\Models\User::where('role', 'dokter')->count() }}</p>
                     </div>
                 </div>
 
-                <div class="bg-white rounded-xl shadow-md p-6 flex items-center">
-                    <div class="p-4 rounded-full bg-emerald-100 text-emerald-500 mr-4">
-                        <i class="fa-solid fa-bed-pulse fa-2x"></i>
+                <div class="bg-white rounded-xl shadow-md p-6 flex items-center border-l-4 border-indigo-500">
+                    <div class="p-4 rounded-full bg-indigo-100 text-indigo-500 mr-4">
+                        <i class="fa-solid fa-user-nurse fa-2x"></i>
                     </div>
                     <div>
-                        <p class="text-sm text-gray-500 font-medium uppercase">Total Pasien</p>
-                        <p class="text-3xl font-bold text-gray-800">{{ \App\Models\Pasien::count() }}</p>
+                        <p class="text-sm text-gray-500 font-medium uppercase">Akun Resepsionis</p>
+                        <p class="text-3xl font-bold text-gray-800">{{ \App\Models\User::where('role', 'resepsionis')->count() }}</p>
                     </div>
                 </div>
+
+                <div class="bg-white rounded-xl shadow-md p-6 flex items-center border-l-4 border-teal-500">
+                    <div class="p-4 rounded-full bg-teal-100 text-teal-500 mr-4">
+                        <i class="fa-solid fa-hospital-user fa-2x"></i>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500 font-medium uppercase">Pasien Baru (Hari Ini)</p>
+                        <p class="text-3xl font-bold text-gray-800">{{ \App\Models\Pasien::whereDate('created_at', \Carbon\Carbon::today())->count() }}</p>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-xl shadow-md p-6 flex items-center border-l-4 border-yellow-500">
+                    <div class="p-4 rounded-full bg-yellow-100 text-yellow-500 mr-4">
+                        <i class="fa-solid fa-hourglass-half fa-2x"></i>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500 font-medium uppercase">Menunggu (Hari Ini)</p>
+                        <p class="text-3xl font-bold text-gray-800">{{ \App\Models\Antrean::where('status', 'Menunggu')->whereDate('created_at', \Carbon\Carbon::today())->count() }}</p>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-xl shadow-md p-6 flex items-center border-l-4 border-cyan-500">
+                    <div class="p-4 rounded-full bg-cyan-100 text-cyan-500 mr-4">
+                        <i class="fa-solid fa-stethoscope fa-2x"></i>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500 font-medium uppercase">Diperiksa (Hari Ini)</p>
+                        <p class="text-3xl font-bold text-gray-800">{{ \App\Models\Antrean::where('status', 'Diperiksa')->whereDate('created_at', \Carbon\Carbon::today())->count() }}</p>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-xl shadow-md p-6 flex items-center border-l-4 border-emerald-500">
+                    <div class="p-4 rounded-full bg-emerald-100 text-emerald-500 mr-4">
+                        <i class="fa-solid fa-check-double fa-2x"></i>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500 font-medium uppercase">Selesai (Hari Ini)</p>
+                        <p class="text-3xl font-bold text-gray-800">{{ \App\Models\Antrean::where('status', 'Selesai')->whereDate('created_at', \Carbon\Carbon::today())->count() }}</p>
+                    </div>
+                </div>
+
             </div>
             
             <div class="mt-8 bg-white rounded-xl shadow-md p-6">
                  <h3 class="text-lg font-semibold text-gray-700 mb-4">Pemberitahuan Sistem</h3>
-                 <p class="text-gray-600">Selamat datang di Sistem Informasi Klinik MedSync. Gunakan menu di sebelah kiri untuk mengelola data klinik.</p>
+                 <p class="text-gray-600">Selamat datang di Sistem Informasi Klinik MedSync. Gunakan menu di sebelah kiri untuk mengelola data klinik. Pantau statistik di atas untuk memantau pergerakan antrean pasien secara *real-time* hari ini.</p>
             </div>
         </div>
     </main>

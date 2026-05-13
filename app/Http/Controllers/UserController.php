@@ -9,17 +9,23 @@ use App\Models\Dokter; // Panggil model Dokter
 class UserController extends Controller
 {
     // TAMPILIN DATA & SEARCH
-    public function index(Request $request)
+   public function index(Request $request)
     {
         $search = $request->search;
-        
-        // Kalau ada pencarian, filter datanya. Kalau nggak ada, tampilin semua.
-        $users = User::when($search, function($query, $search) {
-            return $query->where('nama', 'like', "%{$search}%")
-                         ->orWhere('email', 'like', "%{$search}%");
-        })->get();
+        $role_filter = $request->role; // Tangkap filter role dari URL
 
-        return view('admin.kelola-akun', compact('users', 'search'));
+        // Cari data berdasarkan pencarian DAN filter role, lalu potong per 10 data
+        $users = User::when($search, function($query, $search) {
+                return $query->where('nama', 'like', "%{$search}%")
+                             ->orWhere('email', 'like', "%{$search}%");
+            })
+            ->when($role_filter, function($query, $role_filter) {
+                return $query->where('role', $role_filter);
+            })
+            ->paginate(10) // Ini sihir Laravel buat bikin Pagination otomatis!
+            ->withQueryString(); // Biar pas pindah halaman 2, filternya gak ilang
+
+        return view('admin.kelola-akun', compact('users', 'search', 'role_filter'));
     }
 
     // TAMPILIN FORM TAMBAH
