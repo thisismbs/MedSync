@@ -17,4 +17,10 @@ class Dokter extends Model
 
     // Biarin semua kolom bisa diisi
     protected $guarded = [];
+
+    // Kasih tau Dokter cara nyari data aslinya di tabel Users
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'id_user', 'id_user');
+    }
 }

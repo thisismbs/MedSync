@@ -4,43 +4,76 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Antrean;
+use App\Models\Pasien;
+use App\Models\User;
+use App\Models\Dokter;
 use Carbon\Carbon;
 
 class AntreanController extends Controller
 {
-    public function create()
+    // TAMPILIN TABEL ANTREAN (HARI INI SAJA)
+    public function index(Request $request)
     {
-        return view('antrean.create');
+        // Hanya tampilin antrean hari ini biar resepsionis fokus
+        $antreans = Antrean::whereDate('created_at', Carbon::today())
+            ->with(['pasien', 'dokter.user']) // Tarik relasinya
+            ->orderBy('created_at', 'asc')
+            ->get();
+
+        return view('resepsionis.kelola-antrean', compact('antreans'));
     }
 
+    // TAMPILIN FORM TAMBAH
+    public function create()
+    {
+        $pasiens = Pasien::all(); // Buat dropdown pasien
+        
+        // Tarik data user dokter beserta data spesialisasi dari relasinya
+        $dokters = Dokter::join('users', 'dokter.id_user', '=', 'users.id_user')
+                 ->select('dokter.id_dokter', 'users.nama', 'dokter.spesialisasi')
+                 ->get();
+
+        return view('resepsionis.form-antrean', compact('pasiens', 'dokters'));
+    }
+
+    // SIMPAN ANTREAN
     public function store(Request $request)
     {
-        // 1. Validasi inputan biar gak ada yang kosong
         $request->validate([
             'id_pasien' => 'required',
             'id_dokter' => 'required',
         ]);
 
-        // 2. Logika bikin nomor antrean otomatis
-        // Cari tau hari ini udah ada berapa orang yang antre
-        $hariIni = Carbon::now()->format('Y-m-d');
-        $jumlahAntrean = Antrean::whereDate('created_at', $hariIni)->count();
-        
-        // Tambahin 1 dari jumlah antrean hari ini
-        $urutanBaru = $jumlahAntrean + 1;
-        
-        // Format angkanya biar jadi 3 digit (contoh: 1 jadi 001, 12 jadi 012)
-        $nomorAntreanOtomatis = 'A-' . str_pad($urutanBaru, 3, '0', STR_PAD_LEFT);
+        // Cek anomali (jangan kasih daftar kalau antrean hari ini belum selesai)
+        $cekAntrean = Antrean::where('id_pasien', $request->id_pasien)
+            ->where('status', '!=', 'Selesai')
+            ->whereDate('created_at', Carbon::today())
+            ->first();
 
-        // 3. Simpan ke database
+        if ($cekAntrean) {
+            return redirect()->back()->with('error', 'Pasien ini masih dalam antrean dan belum selesai diperiksa!');
+        }
+
+        // Bikin nomor antrean otomatis (Misal: A-001, A-002)
+        $jumlahAntreanHariIni = Antrean::whereDate('created_at', Carbon::today())->count();
+        $nomorBaru = 'A-' . str_pad($jumlahAntreanHariIni + 1, 3, '0', STR_PAD_LEFT);
+
         Antrean::create([
             'id_pasien' => $request->id_pasien,
             'id_dokter' => $request->id_dokter,
-            'nomor_antrean' => $nomorAntreanOtomatis,
-            'status' => 'Menunggu', // Default status pas pasien baru datang
+            'nomor_antrean' => $nomorBaru,
+            'status' => 'Menunggu' // Default status dari resepsionis
         ]);
 
-        // 4. Balik ke halaman sebelumnya bawa pesan sukses
-        return redirect()->back()->with('success', 'Antrean sukses dibikin! Nomor: ' . $nomorAntreanOtomatis);
+        return redirect()->route('resepsionis.antrean')->with('success', 'Antrean berhasil dibuat dengan nomor: ' . $nomorBaru);
+    }
+
+    // BATALKAN (HAPUS) ANTREAN
+    public function destroy($id)
+    {
+        $antrean = Antrean::findOrFail($id);
+        $antrean->delete();
+
+        return redirect()->route('resepsionis.antrean')->with('success', 'Antrean berhasil dibatalkan.');
     }
 }

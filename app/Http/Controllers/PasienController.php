@@ -18,13 +18,22 @@ class PasienController extends Controller
                          ->orWhere('no_hp', 'like', "%{$search}%");
         })->get();
 
-        return view('admin.kelola-pasien', compact('pasiens', 'search'));
+        // Cek Role buat nentuin view mana yang dibuka
+        if (auth()->user()->role == 'admin') {
+            return view('admin.kelola-pasien', compact('pasiens', 'search'));
+        } else {
+            return view('resepsionis.kelola-pasien', compact('pasiens', 'search'));
+        }
     }
 
     // TAMPILIN FORM TAMBAH
     public function create()
     {
-        return view('admin.form-pasien');
+        if (auth()->user()->role == 'admin') {
+            return view('admin.form-pasien');
+        } else {
+            return view('resepsionis.form-pasien');
+        }
     }
 
     // SIMPAN DATA BARU
@@ -39,14 +48,24 @@ class PasienController extends Controller
 
         Pasien::create($request->all());
 
-        return redirect()->route('admin.pasien')->with('success', 'Data pasien berhasil ditambahkan!');
+        // Cek Role buat nentuin redirect rutenya ke mana abis nge-save
+        if (auth()->user()->role == 'admin') {
+            return redirect()->route('admin.pasien')->with('success', 'Data pasien berhasil ditambahkan!');
+        } else {
+            return redirect()->route('resepsionis.pasien')->with('success', 'Data pasien berhasil ditambahkan!');
+        }
     }
 
     // TAMPILIN FORM EDIT
     public function edit($id)
     {
         $pasien = Pasien::findOrFail($id);
-        return view('admin.form-pasien', compact('pasien'));
+        
+        if (auth()->user()->role == 'admin') {
+            return view('admin.form-pasien', compact('pasien'));
+        } else {
+            return view('resepsionis.form-pasien', compact('pasien'));
+        }
     }
 
     // UPDATE DATA
@@ -62,7 +81,11 @@ class PasienController extends Controller
         $pasien = Pasien::findOrFail($id);
         $pasien->update($request->all());
 
-        return redirect()->route('admin.pasien')->with('success', 'Data pasien berhasil diubah!');
+        if (auth()->user()->role == 'admin') {
+            return redirect()->route('admin.pasien')->with('success', 'Data pasien berhasil diubah!');
+        } else {
+            return redirect()->route('resepsionis.pasien')->with('success', 'Data pasien berhasil diubah!');
+        }
     }
 
     // HAPUS DATA
@@ -71,6 +94,10 @@ class PasienController extends Controller
         $pasien = Pasien::findOrFail($id);
         $pasien->delete();
 
-        return redirect()->route('admin.pasien')->with('success', 'Data pasien berhasil dihapus!');
+        if (auth()->user()->role == 'admin') {
+            return redirect()->route('admin.pasien')->with('success', 'Data pasien berhasil dihapus!');
+        } else {
+            return redirect()->route('resepsionis.pasien')->with('success', 'Data pasien berhasil dihapus!');
+        }
     }
 }

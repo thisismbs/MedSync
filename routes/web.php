@@ -40,6 +40,16 @@ Route::middleware('auth')->group(function () {
     Route::get('/admin/pasien/{id}/edit', [PasienController::class, 'edit'])->name('admin.pasien.edit');
     Route::put('/admin/pasien/{id}', [PasienController::class, 'update'])->name('admin.pasien.update');
     Route::delete('/admin/pasien/{id}', [PasienController::class, 'destroy'])->name('admin.pasien.destroy');
+    Route::get('/resepsionis/pasien', [PasienController::class, 'index'])->name('resepsionis.pasien');
+    Route::get('/resepsionis/pasien/tambah', [PasienController::class, 'create'])->name('resepsionis.pasien.create');
+    Route::post('/resepsionis/pasien', [PasienController::class, 'store'])->name('resepsionis.pasien.store');
+    Route::get('/resepsionis/pasien/{id}/edit', [PasienController::class, 'edit'])->name('resepsionis.pasien.edit');
+    Route::put('/resepsionis/pasien/{id}', [PasienController::class, 'update'])->name('resepsionis.pasien.update');
+    Route::delete('/resepsionis/pasien/{id}', [PasienController::class, 'destroy'])->name('resepsionis.pasien.destroy');
+    Route::get('/resepsionis/antrean', [AntreanController::class, 'index'])->name('resepsionis.antrean');
+    Route::get('/resepsionis/antrean/tambah', [AntreanController::class, 'create'])->name('resepsionis.antrean.create');
+    Route::post('/resepsionis/antrean', [AntreanController::class, 'store'])->name('resepsionis.antrean.store');
+    Route::delete('/resepsionis/antrean/{id}', [AntreanController::class, 'destroy'])->name('resepsionis.antrean.destroy');
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
