@@ -10,17 +10,22 @@ use Illuminate\Notifications\Notifiable;
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable;
-
     /**
      * The attributes that are mass assignable.
      *
      * @var list<string>
      */
+    use HasFactory, Notifiable;
+
+    // 1. Penangkal error login (karena ID kita namanya id_user)
+    protected $primaryKey = 'id_user'; 
+
+    // 2. Penangkal error "Field nama doesn't have a default value"
     protected $fillable = [
-        'name',
+        'nama',      // Harus ada ini
         'email',
         'password',
+        'role',      // Harus ada ini
     ];
 
     /**
