@@ -12,19 +12,21 @@ class RekamMedisController extends Controller
     // TAMPILIN DAFTAR RIWAYAT REKAM MEDIS
     public function index(Request $request)
     {
-        $dokter = Dokter::where('id_user', auth()->user()->id_user)->first();
         $search = $request->search;
+        
+        // Cari ID Dokter yang lagi login
+        $dokter = \App\Models\Dokter::where('id_user', auth()->user()->id_user)->first();
 
-        // Tarik data rekam medis khusus pasiennya dokter ini
-        $riwayats = RekamMedis::with('pasien')
-            ->where('id_dokter', $dokter->id_dokter)
+        // Tarik rekam medis KHUSUS punya dokter ini aja, plus fitur search & pagination
+        $riwayats = \App\Models\RekamMedis::where('id_dokter', $dokter->id_dokter)
             ->when($search, function($query, $search) {
                 return $query->whereHas('pasien', function($q) use ($search) {
                     $q->where('nama', 'like', "%{$search}%");
                 })->orWhere('diagnosa', 'like', "%{$search}%");
             })
-            ->orderBy('created_at', 'desc')
-            ->get();
+            ->orderBy('tanggal', 'desc') // Urutin dari yang paling baru
+            ->paginate(10)
+            ->withQueryString();
 
         return view('dokter.rekammedis', compact('riwayats', 'search'));
     }

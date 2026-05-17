@@ -6,10 +6,13 @@
     <title>MedSync - Dasbor (Dokter)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
 </head>
-<body class="bg-gray-100 flex h-screen overflow-hidden text-gray-800">
+<body class="bg-gray-100 flex h-screen overflow-hidden text-gray-800" x-data="{ sidebarOpen: false }">
 
-    <aside class="w-64 bg-teal-800 text-white flex flex-col">
+    <div x-show="sidebarOpen" class="fixed inset-0 z-20 transition-opacity bg-black opacity-50 lg:hidden" @click="sidebarOpen = false"></div>
+
+    <aside :class="sidebarOpen ? 'translate-x-0 ease-out' : '-translate-x-full ease-in'" class="fixed inset-y-0 left-0 z-30 w-64 overflow-y-auto transition duration-300 transform bg-teal-800 text-white lg:translate-x-0 lg:static lg:inset-0 flex flex-col">
         <div class="p-6 border-b border-teal-700 flex flex-col items-center">
             <i class="fa-solid fa-house-medical fa-3x mb-2 text-teal-300"></i>
             <h1 class="text-2xl font-bold tracking-wider">MedSync</h1>
@@ -29,38 +32,43 @@
         <div class="p-4 border-t border-teal-700">
             <form method="POST" action="{{ route('logout') }}">
                 @csrf
-                <a href="{{ route('logout') }}" onclick="event.preventDefault(); this.closest('form').submit();" class="block px-4 py-2 text-center bg-red-500 hover:bg-red-600 rounded-lg transition-colors">
+                <button type="submit" class="w-full px-4 py-2 text-center bg-red-500 hover:bg-red-600 rounded-lg transition-colors text-white">
                     <i class="fa-solid fa-sign-out-alt mr-2"></i> Keluar
-                </a>
+                </button>
             </form>
         </div>
     </aside>
 
     <main class="flex-1 flex flex-col relative h-screen overflow-y-auto">
-        <header class="bg-white shadow-sm px-8 py-4 flex justify-between items-center">
-            <h2 class="text-xl font-semibold text-gray-700">Dasbor Dokter</h2>
+        <header class="bg-white shadow-sm px-4 lg:px-8 py-4 flex justify-between items-center">
+            <div class="flex items-center">
+                <button @click="sidebarOpen = true" class="text-gray-500 focus:outline-none lg:hidden mr-4">
+                    <i class="fa-solid fa-bars fa-lg"></i>
+                </button>
+                <h2 class="text-xl font-semibold text-gray-700">Dasbor Dokter</h2>
+            </div>
             <div class="flex items-center space-x-4">
-                <span class="text-sm font-medium">Halo, Dr. {{ Auth::user()->nama }}</span>
+                <span class="text-sm font-medium hidden sm:block">Halo, Dr. {{ Auth::user()->nama }}</span>
                 <div class="w-10 h-10 rounded-full bg-teal-500 flex items-center justify-center text-white font-bold">
                     {{ substr(Auth::user()->nama, 0, 1) }}
                 </div>
             </div>
         </header>
 
-        <div class="p-8">
+        <div class="p-4 lg:p-8">
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                 <div class="bg-white rounded-xl shadow-md p-6 flex items-center border-l-4 border-blue-500">
-                    <div class="p-4 rounded-full bg-blue-100 text-blue-500 mr-4">
+                    <div class="p-4 rounded-full bg-blue-100 text-blue-500 mr-4 flex-shrink-0">
                         <i class="fa-solid fa-users fa-2x"></i>
                     </div>
                     <div>
-                        <p class="text-sm text-gray-500 font-medium uppercase">Total Pasien Hari Ini</p>
+                        <p class="text-sm text-gray-500 font-medium uppercase">Total Antrean Hari Ini</p>
                         <p class="text-3xl font-bold text-gray-800">{{ $totalPasien }}</p>
                     </div>
                 </div>
 
                 <div class="bg-white rounded-xl shadow-md p-6 flex items-center border-l-4 border-yellow-500">
-                    <div class="p-4 rounded-full bg-yellow-100 text-yellow-500 mr-4">
+                    <div class="p-4 rounded-full bg-yellow-100 text-yellow-500 mr-4 flex-shrink-0">
                         <i class="fa-solid fa-hourglass-half fa-2x"></i>
                     </div>
                     <div>
@@ -70,7 +78,7 @@
                 </div>
 
                 <div class="bg-white rounded-xl shadow-md p-6 flex items-center border-l-4 border-emerald-500">
-                    <div class="p-4 rounded-full bg-emerald-100 text-emerald-500 mr-4">
+                    <div class="p-4 rounded-full bg-emerald-100 text-emerald-500 mr-4 flex-shrink-0">
                         <i class="fa-solid fa-check-double fa-2x"></i>
                     </div>
                     <div>
@@ -81,8 +89,8 @@
             </div>
             
             <div class="bg-white rounded-xl shadow-md p-6">
-                <h3 class="text-lg font-bold text-gray-800 mb-4 border-b pb-2">Jadwal & Informasi</h3>
-                <p class="text-gray-600 mb-2">Selamat bekerja, Dr. {{ Auth::user()->nama }}. Spesialisasi Anda tercatat sebagai: <strong>{{ optional($dokter)->spesialisasi }}</strong>.</p>
+                <h3 class="text-lg font-bold text-gray-800 mb-4 border-b pb-2">Pemberitahuan</h3>
+                <p class="text-gray-600 mb-2">Selamat bekerja, Dr. <strong>{{ Auth::user()->nama }}</strong>.</p>
                 <p class="text-gray-600">Silakan pantau menu <span class="font-semibold text-teal-600">Antrean Pasien</span> untuk memanggil pasien berikutnya ke ruangan Anda.</p>
             </div>
         </div>

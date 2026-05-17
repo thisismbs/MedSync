@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MedSync - Form Pasien (resepsionis)</title>
+    <title>MedSync - Form Pasien (Resepsionis)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
@@ -16,7 +16,7 @@
         <div class="p-6 border-b border-teal-700 flex flex-col items-center">
             <i class="fa-solid fa-house-medical fa-3x mb-2 text-teal-300"></i>
             <h1 class="text-2xl font-bold tracking-wider">MedSync</h1>
-            <p class="text-teal-200 text-sm mt-1">Peran: resepsionisistrator</p>
+            <p class="text-teal-200 text-sm mt-1">Peran: Resepsionis</p>
         </div>
         <nav class="flex-1 px-4 py-6 space-y-2">
             <a href="{{ route('dashboard') }}" class="block px-4 py-3 rounded-lg hover:bg-teal-700 transition-colors">
@@ -67,15 +67,15 @@
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-2">Tanggal Lahir</label>
-                            <input type="date" name="tgl_lahir" value="{{ $pasien->tgl_lahir ?? '' }}" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:outline-none">
+                            <input type="date" name="tgl_lahir" value="{{ $pasien->tgl_lahir ?? '' }}" max="{{ \Carbon\Carbon::today()->format('Y-m-d') }}" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:outline-none">
                         </div>
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Nomor HP</label>
-                            <input type="tel" name="no_hp" value="{{ $pasien->no_hp ?? '' }}" required placeholder="Contoh: 081234567890" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:outline-none">
-                        </div>
+    <label class="block text-sm font-medium text-gray-700 mb-2">Nomor HP</label>
+    <input type="tel" name="no_hp" value="{{ $pasien->no_hp ?? '' }}" x-on:input="$el.value = $el.value.replace(/[^0-9]/g, '')" required placeholder="Contoh: 081234567890" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:outline-none">
+</div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-2">Alamat Lengkap</label>
                             <textarea name="alamat" required rows="2" placeholder="Masukkan alamat domisili..." class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:outline-none">{{ $pasien->alamat ?? '' }}</textarea>

@@ -59,37 +59,102 @@
                     @csrf
                     
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Pilih Pasien</label>
-                            <select name="id_pasien" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:outline-none bg-white" required>
-                                <option value="">-- Pilih Pasien --</option>
+                        
+                        <div x-data="{
+                            open: false,
+                            search: '',
+                            selectedId: '',
+                            selectedName: '-- Cari / Pilih Pasien --',
+                            items: [
                                 @foreach($pasiens as $pas)
-                                    <option value="{{ $pas->id_pasien }}">{{ $pas->nama }} - {{ $pas->no_hp }}</option>
+                                    { id: '{{ $pas->id_pasien }}', name: '{{ addslashes($pas->nama) }} - {{ $pas->no_hp }}' },
                                 @endforeach
-                            </select>
-                            <p class="text-xs text-gray-500 mt-1">*Jika pasien belum terdaftar, silakan ke menu Data Pasien.</p>
+                            ],
+                            get filteredItems() {
+                                if (this.search === '') return this.items;
+                                return this.items.filter(item => item.name.toLowerCase().includes(this.search.toLowerCase()));
+                            },
+                            selectItem(item) {
+                                this.selectedId = item.id;
+                                this.selectedName = item.name;
+                                this.open = false;
+                            }
+                        }" @click.away="open = false" class="relative"> <label class="block text-sm font-medium text-gray-700 mb-2">Pilih Pasien</label>
+                            
+                            <input type="hidden" name="id_pasien" :value="selectedId" required>
+                            
+                            <div @click="open = !open" class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-white cursor-pointer flex justify-between items-center focus:ring-2 focus:ring-teal-500">
+                                <span x-text="selectedName" :class="selectedId === '' ? 'text-gray-500' : 'text-gray-800'" class="truncate"></span>
+                                <i class="fa-solid fa-chevron-down text-gray-400"></i>
+                            </div>
+
+                            <div x-show="open" x-transition class="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                                <div class="p-2 sticky top-0 bg-white border-b">
+                                    <input type="text" x-model="search" placeholder="Ketik nama pasien..." class="w-full px-3 py-1.5 border border-gray-200 rounded focus:outline-none focus:border-teal-500 text-sm">
+                                </div>
+                                <ul>
+                                    <template x-for="item in filteredItems" :key="item.id">
+                                        <li @click="selectItem(item)" class="px-4 py-2 hover:bg-teal-50 cursor-pointer text-sm text-gray-700 transition-colors" x-text="item.name"></li>
+                                    </template>
+                                    <li x-show="filteredItems.length === 0" class="px-4 py-2 text-sm text-gray-500 text-center">Data tidak ditemukan</li>
+                                </ul>
+                            </div>
+                            <p class="text-xs text-gray-500 mt-1">*Jika pasien belum ada, ke menu Data Pasien.</p>
                         </div>
 
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Pilih Dokter Tujuan</label>
-                            <select name="id_dokter" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:outline-none bg-white" required>
-                                <option value="">-- Pilih Dokter --</option>
+                        <div x-data="{
+                            open: false,
+                            search: '',
+                            selectedId: '',
+                            selectedName: '-- Cari / Pilih Dokter --',
+                            items: [
                                 @foreach($dokters as $dok)
-                                    <option value="{{ $dok->id_dokter }}">Dr. {{ $dok->nama }} (Spesialis: {{ $dok->spesialisasi }})</option>
+                                    { id: '{{ $dok->id_dokter }}', name: 'Dr. {{ addslashes($dok->nama) }}' },
                                 @endforeach
-                            </select>
+                            ],
+                            get filteredItems() {
+                                if (this.search === '') return this.items;
+                                return this.items.filter(item => item.name.toLowerCase().includes(this.search.toLowerCase()));
+                            },
+                            selectItem(item) {
+                                this.selectedId = item.id;
+                                this.selectedName = item.name;
+                                this.open = false;
+                            }
+                        }" @click.away="open = false" class="relative"> <label class="block text-sm font-medium text-gray-700 mb-2">Pilih Dokter Tujuan</label>
+                            
+                            <input type="hidden" name="id_dokter" :value="selectedId" required>
+                            
+                            <div @click="open = !open" class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-white cursor-pointer flex justify-between items-center focus:ring-2 focus:ring-teal-500">
+                                <span x-text="selectedName" :class="selectedId === '' ? 'text-gray-500' : 'text-gray-800'" class="truncate"></span>
+                                <i class="fa-solid fa-chevron-down text-gray-400"></i>
+                            </div>
+
+                            <div x-show="open" x-transition class="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                                <div class="p-2 sticky top-0 bg-white border-b">
+                                    <input type="text" x-model="search" placeholder="Ketik nama dokter..." class="w-full px-3 py-1.5 border border-gray-200 rounded focus:outline-none focus:border-teal-500 text-sm">
+                                </div>
+                                <ul>
+                                    <template x-for="item in filteredItems" :key="item.id">
+                                        <li @click="selectItem(item)" class="px-4 py-2 hover:bg-teal-50 cursor-pointer text-sm text-gray-700 transition-colors" x-text="item.name"></li>
+                                    </template>
+                                    <li x-show="filteredItems.length === 0" class="px-4 py-2 text-sm text-gray-500 text-center">Data tidak ditemukan</li>
+                                </ul>
+                            </div>
                         </div>
+
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-2">Tanggal Antrean</label>
-                            <input type="text" class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-100 text-gray-500 cursor-not-allowed focus:outline-none" value="HARI INI" readonly>
+                            <div class="relative">
+                                <i class="fa-regular fa-calendar absolute left-3 top-3 text-gray-400"></i>
+                                <input type="text" class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-600 font-medium cursor-not-allowed focus:outline-none" value="{{ \Carbon\Carbon::today()->format('d-m-Y') }}" readonly>
+                            </div>
                         </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Status Antrean</label>
-                            <input type="text" class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-100 text-gray-600 font-semibold cursor-not-allowed focus:outline-none" value="Menunggu" readonly>
-                        </div>
+                        
+                        <input type="hidden" name="status" value="Menunggu">
                     </div>
 
                     <div class="pt-6 mt-6 border-t flex justify-end space-x-3">

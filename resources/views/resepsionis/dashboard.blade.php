@@ -33,7 +33,7 @@
         <div class="p-4 border-t border-teal-700">
             <form method="POST" action="{{ route('logout') }}">
                 @csrf
-                <a href="{{ route('logout') }}" onclick="event.preventDefault(); this.closest('form').submit();" class="block px-4 py-2 text-center bg-red-500 hover:bg-red-600 rounded-lg transition-colors">
+                <a href="{{ route('logout') }}" onclick="event.preventDefault(); this.closest('form').submit();" class="block px-4 py-2 text-center bg-red-500 hover:bg-red-600 rounded-lg transition-colors text-white">
                     <i class="fa-solid fa-sign-out-alt mr-2"></i> Keluar
                 </a>
             </form>
@@ -58,31 +58,54 @@
         </header>
 
         <div class="p-4 lg:p-8">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div class="bg-white rounded-xl shadow-md p-6 flex items-center">
-                    <div class="p-4 rounded-full bg-blue-100 text-blue-500 mr-4">
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+                
+                <div class="bg-white rounded-xl shadow-md p-6 flex items-center border-l-4 border-blue-500">
+                    <div class="p-4 rounded-full bg-blue-100 text-blue-500 mr-4 flex-shrink-0">
                         <i class="fa-solid fa-users fa-2x"></i>
                     </div>
                     <div>
-                        <p class="text-sm text-gray-500 font-medium uppercase">Total Pasien Klinik</p>
+                        <p class="text-xs text-gray-500 font-medium uppercase">Total Pasien Terdaftar</p>
                         <p class="text-3xl font-bold text-gray-800">{{ \App\Models\Pasien::count() }}</p>
                     </div>
                 </div>
 
-                <div class="bg-white rounded-xl shadow-md p-6 flex items-center">
-                    <div class="p-4 rounded-full bg-emerald-100 text-emerald-500 mr-4">
+                <div class="bg-white rounded-xl shadow-md p-6 flex items-center border-l-4 border-teal-500">
+                    <div class="p-4 rounded-full bg-teal-100 text-teal-500 mr-4 flex-shrink-0">
                         <i class="fa-solid fa-clipboard-list fa-2x"></i>
                     </div>
                     <div>
-                        <p class="text-sm text-gray-500 font-medium uppercase">Antrean Hari Ini</p>
+                        <p class="text-xs text-gray-500 font-medium uppercase">Antrean Hari Ini</p>
                         <p class="text-3xl font-bold text-gray-800">{{ \App\Models\Antrean::whereDate('created_at', \Carbon\Carbon::today())->count() }}</p>
                     </div>
                 </div>
+
+                <div class="bg-white rounded-xl shadow-md p-6 flex items-center border-l-4 border-yellow-500">
+                    <div class="p-4 rounded-full bg-yellow-100 text-yellow-500 mr-4 flex-shrink-0">
+                        <i class="fa-solid fa-hourglass-half fa-2x"></i>
+                    </div>
+                    <div>
+                        <p class="text-xs text-gray-500 font-medium uppercase">Menunggu Giliran</p>
+                        <p class="text-3xl font-bold text-gray-800">{{ \App\Models\Antrean::where('status', 'Menunggu')->whereDate('created_at', \Carbon\Carbon::today())->count() }}</p>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-xl shadow-md p-6 flex items-center border-l-4 border-emerald-500">
+                    <div class="p-4 rounded-full bg-emerald-100 text-emerald-500 mr-4 flex-shrink-0">
+                        <i class="fa-solid fa-check-double fa-2x"></i>
+                    </div>
+                    <div>
+                        <p class="text-xs text-gray-500 font-medium uppercase">Selesai Diperiksa</p>
+                        <p class="text-3xl font-bold text-gray-800">{{ \App\Models\Antrean::where('status', 'Selesai')->whereDate('created_at', \Carbon\Carbon::today())->count() }}</p>
+                    </div>
+                </div>
+
             </div>
             
             <div class="mt-8 bg-white rounded-xl shadow-md p-6">
                  <h3 class="text-lg font-semibold text-gray-700 mb-4">Pemberitahuan Sistem</h3>
-                 <p class="text-gray-600">Selamat datang di MedSync. Silakan gunakan menu <b>Data Pasien</b> untuk mengelola identitas pasien, atau <b>Kelola Antrean</b> untuk mengatur pendaftaran pasien ke ruang periksa.</p>
+                 <p class="text-gray-600">Selamat datang di MedSync. Pantau terus status antrean melalui dasbor ini. Gunakan menu <span class="font-bold text-teal-700">Data Pasien</span> untuk mendaftarkan pasien baru, atau <span class="font-bold text-teal-700">Kelola Antrean</span> untuk mengatur alur pasien ke ruang periksa hari ini.</p>
             </div>
         </div>
     </main>

@@ -89,12 +89,23 @@ class PasienController extends Controller
         }
     }
 
-    // HAPUS DATA
+   // HAPUS DATA
     public function destroy($id)
     {
-        $pasien = Pasien::findOrFail($id);
-        $pasien->delete();
+        try {
+            $pasien = Pasien::findOrFail($id);
+            $pasien->delete();
 
-        return redirect()->back()->with('success', 'Data pasien berhasil dihapus!');
+            return redirect()->back()->with('success', 'Data pasien berhasil dihapus!');
+            
+        } catch (\Illuminate\Database\QueryException $e) {
+            // Kode 23000 itu kode standar SQL buat pelanggaran relasi (Foreign Key Constraint)
+            if ($e->getCode() == "23000") {
+                return redirect()->back()->with('error', 'Akses Ditolak! Pasien ini tidak bisa dihapus karena masih memiliki riwayat Antrean atau Rekam Medis.');
+            }
+            
+            // Kalau error database lain
+            return redirect()->back()->with('error', 'Terjadi kesalahan pada database saat menghapus data.');
+        }
     }
 }

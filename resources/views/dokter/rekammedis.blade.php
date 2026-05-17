@@ -69,7 +69,7 @@
                     <form action="{{ route('dokter.rekammedis') }}" method="GET" class="relative w-full sm:w-72 flex">
                         <input type="text" name="search" value="{{ $search ?? '' }}" placeholder="Cari nama pasien / diagnosa..." class="w-full border border-gray-300 rounded-l-lg px-4 py-2 pl-10 focus:outline-none focus:ring-2 focus:ring-teal-500">
                         <i class="fa-solid fa-search absolute left-3 top-3 text-gray-400"></i>
-                        <button type="submit" class="bg-teal-600 text-white px-4 py-2 rounded-r-lg hover:bg-teal-700">Cari</button>
+                        <button type="submit" class="bg-teal-600 text-white px-4 py-2 rounded-r-lg hover:bg-teal-700 transition-colors">Cari</button>
                     </form>
                 </div>
 
@@ -95,7 +95,7 @@
                             @endphp
 
                             <tr class="border-b border-gray-100 hover:bg-gray-50">
-                                <td class="p-4 text-gray-500 font-medium">{{ $index + 1 }}</td>
+                                <td class="p-4 text-gray-500 font-medium">{{ $riwayats->firstItem() + $index }}</td>
                                 <td class="p-4 font-semibold text-gray-700">{{ \Carbon\Carbon::parse($riwayat->tanggal)->format('d M Y') }}</td>
                                 <td class="p-4 font-bold text-teal-700">{{ optional($riwayat->pasien)->nama }}</td>
                                 <td class="p-4 text-gray-600 truncate max-w-xs" title="{{ $keluhanText }}">{{ \Illuminate\Support\Str::limit($keluhanText, 40) }}</td>
@@ -105,7 +105,7 @@
                                     </span>
                                 </td>
                                 <td class="p-4 flex justify-center space-x-2">
-                                    <a href="{{ route('dokter.rekammedis.show', $riwayat->id_rekam) }}" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1.5 rounded text-xs transition-colors" title="Lihat Detail Resep & Tindakan">
+                                    <a href="{{ route('dokter.rekammedis.show', $riwayat->id_rekam) }}" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1.5 rounded text-xs transition-colors shadow-sm" title="Lihat Detail Resep & Tindakan">
                                         <i class="fa-solid fa-eye mr-1"></i> Detail
                                     </a>
                                 </td>
@@ -118,9 +118,11 @@
                         </tbody>
                     </table>
                 </div>
-                <div class="mt-4 flex justify-end">
-                    <span class="text-sm text-gray-500">Menampilkan {{ $riwayats->count() }} riwayat medis</span>
+                
+                <div class="mt-6 border-t pt-4">
+                    {{ $riwayats->links() }}
                 </div>
+                
             </div>
         </div>
     </main>
